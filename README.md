@@ -5,9 +5,9 @@
 
   Single multithreaded TCP server communicates with multiple clients using multiple ephemeral ports.
 
-	1. Multithreaded TCP chat server declares 1 thread to run ‘Portal TCP Server’ on port 50000; four threads to run ‘Worker TCP Server’ on port ‘50001~50004’. All threads listening to different TCP ports.
+  1. Multithreaded TCP chat server declares 1 thread to run ‘Portal TCP Server’ on port 50000; four threads to run ‘Worker TCP Server’ on port ‘50001~50004’. All threads listening to different TCP ports.
 
-	2. All TCP chat clients who want to establish TCP connection with chat server firstly go to ‘Portal TCP Server’ on port 50000. ‘Portal TCP Server’ will informs chat clients which available TCP ports to connect by using shared workloads-stack.
+  2. All TCP chat clients who want to establish TCP connection with chat server firstly go to ‘Portal TCP Server’ on port 50000. ‘Portal TCP Server’ will informs chat clients which available TCP ports to connect by using shared workloads-stack.
 
 	3. Chat client establish TCP connection with the available ‘Worker TCP Server’ on assigned port.
 
