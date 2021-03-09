@@ -15,11 +15,11 @@
 
   5. To avoid stray chat-clients connect to ‘Worker TCP Server’ directly without firstly visit ‘Portal TCP Server’.
 
-   a. chat-client should get handshake passcode from ‘Portal TCP Server’.
+    a. chat-client should get handshake passcode from ‘Portal TCP Server’.
 
-   b. Afterward, chat-client connect to the assigned port of ‘Worker TCP Server’ and send the handshake passcode to maintain connection.
+    b. Afterward, chat-client connect to the assigned port of ‘Worker TCP Server’ and send the handshake passcode to maintain connection.
 
-   c. If ‘Worker TCP Server’ did not get the correct handshake passcode, ‘Worker TCP Server’ closes the TCP connection.
+    c. If ‘Worker TCP Server’ did not get the correct handshake passcode, ‘Worker TCP Server’ closes the TCP connection.
 
   6. After chat-client established TCP connection with the assigned ‘Worker TCP Server’. If chat-client idle and do not send message to ‘Worker TCP Server’ for a preset timeout period, the TCP connection will be closed. ‘Worker TCP Server’ send string message "SERVER>>> TIMEOUT" to inform chat-client about connection timeout. ‘Worker TCP Server’ push it port number back to shared workloads-stack, ready to listen new incoming TCP connection.
 
@@ -31,8 +31,8 @@
 
 In the below example code, port number ‘50001’ chat-client will chat with port number ‘50002’ chat-client; port number ‘50003’ chat-client will chat with port number ‘50004’ chat-client.
 
- 
-
+Contrast to the below example, client can tell server to establish connection with client assigned port. That's means client at initial connection inform server which client IP & port should server connect to, then close the connection. Then client listen to the pre-determine port, waiting for server to establish connection.
+  
 c# multithreaded TCP chat-server Console App:  TCP_Chat_Server_Console.cs.txt
 
 c# TCP chat-client Windows Forms App: TCP_Chat_Client.zip 
