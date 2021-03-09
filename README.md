@@ -5,17 +5,17 @@
 
   Single multithreaded TCP server communicates with multiple clients using multiple ephemeral ports.
 
-*     Multithreaded TCP chat server declares 1 thread to run ‘Portal TCP Server’ on port 50000; four threads to run ‘Worker TCP Server’ on port ‘50001~50004’. All threads listening to different TCP ports.
+	1. Multithreaded TCP chat server declares 1 thread to run ‘Portal TCP Server’ on port 50000; four threads to run ‘Worker TCP Server’ on port ‘50001~50004’. All threads listening to different TCP ports.
 
-*     All TCP chat clients who want to establish TCP connection with chat server firstly go to ‘Portal TCP Server’ on port 50000. ‘Portal TCP Server’ will informs chat clients which available TCP ports to connect by using shared workloads-stack.
+	2. All TCP chat clients who want to establish TCP connection with chat server firstly go to ‘Portal TCP Server’ on port 50000. ‘Portal TCP Server’ will informs chat clients which available TCP ports to connect by using shared workloads-stack.
 
-*     Chat client establish TCP connection with the available ‘Worker TCP Server’ on assigned port.
+	3. Chat client establish TCP connection with the available ‘Worker TCP Server’ on assigned port.
 
-*     If chat client did not establish TCP connection with the ‘Worker TCP Server’ on assigned port within preset timeout period, the port number will be pushed back into shared workloads-stack. The assigned ‘Worker TCP Server’s handshake passcode will be changed too.
+	4. If chat client did not establish TCP connection with the ‘Worker TCP Server’ on assigned port within preset timeout period, the port number will be pushed back into shared workloads-stack. The assigned ‘Worker TCP Server’s handshake passcode will be changed too.
 
-*     To avoid stray chat-clients connect to ‘Worker TCP Server’ directly without firstly visit ‘Portal TCP Server’.
+	5. To avoid stray chat-clients connect to ‘Worker TCP Server’ directly without firstly visit ‘Portal TCP Server’.
 
-**     chat-client should get handshake passcode from ‘Portal TCP Server’.
+		a. chat-client should get handshake passcode from ‘Portal TCP Server’.
 
 **     Afterward, chat-client connect to the assigned port of ‘Worker TCP Server’ and send the handshake passcode to maintain connection.
 
