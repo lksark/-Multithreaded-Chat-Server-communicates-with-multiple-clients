@@ -3,7 +3,7 @@
 
  The example code below demonstrates how it works.
 
-  Single multithreaded TCP server maintains communication with multiple clients concurrently using multiple ephemeral ports.
+Single multithreaded TCP server can maintain communications and duplex data transmission with multiple clients concurrently using multiple ports.
 
   1. Multithreaded TCP chat server declares 1 thread to run ‘Portal TCP Server’ on port 50000; four threads to run ‘Worker TCP Server’ on port ‘50001~50004’. All threads listening to different TCP ports.
 
@@ -33,6 +33,7 @@ In the below example code, port number ‘50001’ chat-client will chat with po
 
 Contrast to the below example, client can tell server to establish connection with client assigned port. That's means client at initial connection inform server which client IP & port should server connect to, then close the connection. Then client listen to the pre-determine port, waiting for server to establish connection.
 
-c# multithreaded TCP chat-server Console App:  TCP_Chat_Server_Console.cs.txt
+c# multithreaded TCP chat-server Console App:  [TCP_Chat_Server_Console.cs.txt](https://github.com/lksark/-Multithreaded-Chat-Server-communicates-with-multiple-clients/blob/main/TCP_Chat_Server_Console.cs.txt)
 
 c# TCP chat-client Windows Forms App: TCP_Chat_Client.zip 
+[TCP_Chat_Client.zip](https://github.com/lksark/-Multithreaded-Chat-Server-communicates-with-multiple-clients/blob/main/TCP_Chat_Client.zip)
