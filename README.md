@@ -21,9 +21,10 @@ Single multithreaded TCP server can maintain communications and duplex data tran
 
     c. If ‘Worker TCP Server’ did not get the correct handshake passcode, ‘Worker TCP Server’ closes the TCP connection.
 
-  6. After chat-client established TCP connection with the assigned ‘Worker TCP Server’. If chat-client idle and do not send message to ‘Worker TCP Server’ for a preset timeout period, the TCP connection will be closed. ‘Worker TCP Server’ send string message "SERVER>>> TIMEOUT" to inform chat-client about connection timeout. ‘Worker TCP Server’ push it port number back to shared workloads-stack, ready to listen new incoming TCP connection.
+  6. After chat-client established TCP connection with the assigned ‘Worker TCP Server’. If chat-client idle and do not send message to ‘Worker TCP Server’ for a preset timeout period, the TCP connection will be closed. ‘Worker TCP Server’ send string message "SERVER>>> IDLE TIMEOUT" to inform chat-client about connection timeout. ‘Worker TCP Server’ push it port number back to shared workloads-stack, ready to listen new incoming TCP connection.
+     Optionally we can preset maximum total connected time of client to ‘Worker TCP Server’. After maximum total connected time, ‘Worker TCP Server’ will close the connection with client by sending string message “SERVER>>> TOTAL TIME TIMEOUT” to client. Even though client remain active during the period.
 
-  7. If all ‘Worker TCP Server’ are currently occupied, ‘Portal TCP Server’ send string message "SERVER>>>full" to the new chat-client. New chat-client should sleep for 2 seconds before re-attempt to inquire ‘Portal TCP Server’.
+  7. If all ‘Worker TCP Server’ are currently occupied, ‘Portal TCP Server’ send string message "SERVER>>> FULL" to the new chat-client. New chat-client should sleep for 2 seconds before re-attempt to inquire ‘Portal TCP Server’.
 
   8. Assume ‘class_currTimeDate’ is a RTC that trigger interrupt in 1 second or 2 seconds frequency.
 
