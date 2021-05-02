@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,7 +17,7 @@ namespace TCP_Chat_Server_Console
 
         static class_mulithreading_Stack shared_worker_TCPServer_status;
         static class_worker_TCP_ChatServer[] object_worker_TCP_ChatServer = new class_worker_TCP_ChatServer[worker_TCPServer_count];
-        static class_Handshake_Code[] object_Handshake_Code = new class_Handshake_Code[worker_TCPServer_count];
+        static class_Handshake_Code[] object_Handshake_Passcode = new class_Handshake_Code[worker_TCPServer_count];
         static class_currTimeDate currTimeDate = new class_currTimeDate();
         static class_check_connection_timeout object_check_connection_timeout = new class_check_connection_timeout(worker_TCPServer_count);
 
@@ -33,7 +33,7 @@ namespace TCP_Chat_Server_Console
 
             for (int i = 0; i < worker_TCPServer_count; i++)
             {
-                object_Handshake_Code[i] = new class_Handshake_Code();
+                object_Handshake_Passcode[i] = new class_Handshake_Code();
 
                 object_worker_TCP_ChatServer[i] = new class_worker_TCP_ChatServer(i, 50001 + i);
 
@@ -218,7 +218,7 @@ namespace TCP_Chat_Server_Console
                 Handshake_Code = 0;
             }
 
-            public int set_Handshake_code()
+            public int set_Handshake_Passcode()
             {
                 Random myRandom = new Random();
 
@@ -423,7 +423,7 @@ namespace TCP_Chat_Server_Console
                                 {
                                     if (worker_TCPServer_timeout_WaitingClientConnection[i].get_timeout_WaitingClientConnection())       // if current port number timeout in waiting for expected client to connect
                                     {
-                                        object_Handshake_Code[i].set_Handshake_code();
+                                        object_Handshake_Passcode[i].set_Handshake_Passcode();
                                         shared_worker_TCPServer_status.Push(i);
                                     }
                                 }
@@ -619,7 +619,7 @@ namespace TCP_Chat_Server_Console
                             Console.WriteLine("worker port " + port_number + " connected to client wih IP " + ep.Address.ToString());
 
                         string theReply = "";
-                        HandshakePasscode = object_Handshake_Code[worker_TCP_ChatServer_ID].get_Handshake_code();
+                        HandshakePasscode = object_Handshake_Passcode[worker_TCP_ChatServer_ID].get_Handshake_code();
 
                         // read handshaking passcode sent from client to worker server. Client must send handshake passcode to server within 1 second, or else worker server will close this connection.
                         object_check_connection_timeout.set_timeout_IdleConnection(worker_TCP_ChatServer_ID, 1);
@@ -680,6 +680,8 @@ namespace TCP_Chat_Server_Console
                             // If TCP client's handshake passcode does not tally with worker TCP server. Or client sending other irrelevant info but not handshake passcode.
                             if(theReply != "")
                                 server_send_text("SERVER" + port_number + ">>> Wrong handshake passcode");
+                                
+                            object_Handshake_Passcode[port_number - 50001].set_Handshake_Passcode();                // Worker server change to new handshake passcode. Purpose is client only has one chance sends the correct handshake passcode.
                         }
 
                         if (theReply == "CLIENT>>> TERMINATE")
@@ -775,7 +777,7 @@ namespace TCP_Chat_Server_Console
                             if (worker_TCP_port.Item1)
                             {
                                 object_check_connection_timeout.set_timeout_WaitingConnection(worker_TCP_port.Item2 - 50001);
-                                writer.Write("SERVER>>>Port=>" + worker_TCP_port.Item2 + ",HandshakeCode=" + object_Handshake_Code[worker_TCP_port.Item2 - 50001].set_Handshake_code());
+                                writer.Write("SERVER>>>Port=>" + worker_TCP_port.Item2 + ",HandshakeCode=" + object_Handshake_Passcode[worker_TCP_port.Item2 - 50001].set_Handshake_Passcode());
                                 //Console.WriteLine("\r\nAssigned to port " + worker_TCP_port.Item2);
                             }
                             else
