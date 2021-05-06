@@ -17,7 +17,7 @@ namespace TCP_Chat_Server_Console
 
         static class_mulithreading_Stack shared_worker_TCPServer_status;
         static class_worker_TCP_ChatServer[] object_worker_TCP_ChatServer = new class_worker_TCP_ChatServer[worker_TCPServer_count];
-        static class_Handshake_Code[] object_Handshake_Passcode = new class_Handshake_Code[worker_TCPServer_count];
+        static class_Handshake_Passcode[] object_Handshake_Passcode = new class_Handshake_Passcode[worker_TCPServer_count];
         static class_currTimeDate currTimeDate = new class_currTimeDate();
         static class_check_connection_timeout object_check_connection_timeout = new class_check_connection_timeout(worker_TCPServer_count);
 
@@ -25,21 +25,20 @@ namespace TCP_Chat_Server_Console
         {
             shared_worker_TCPServer_status = new class_mulithreading_Stack();
 
-            class_portal_TCP_ChatServer object_portal_TCP = new class_portal_TCP_ChatServer();
-            Thread PortalThread_TCP = new Thread(new ThreadStart(object_portal_TCP.RunServer));
-            PortalThread_TCP.Start();
-
             Thread[] WorkerThreadsArray_TCP = new Thread[worker_TCPServer_count];
-
             for (int i = 0; i < worker_TCPServer_count; i++)
             {
-                object_Handshake_Passcode[i] = new class_Handshake_Code();
+                object_Handshake_Passcode[i] = new class_Handshake_Passcode();
 
                 object_worker_TCP_ChatServer[i] = new class_worker_TCP_ChatServer(i, 50001 + i);
 
                 WorkerThreadsArray_TCP[i] = new Thread(new ThreadStart(object_worker_TCP_ChatServer[i].RunServer));
                 WorkerThreadsArray_TCP[i].Start();
             }
+
+            class_portal_TCP_ChatServer object_portal_TCP = new class_portal_TCP_ChatServer();
+            Thread PortalThread_TCP = new Thread(new ThreadStart(object_portal_TCP.RunServer));
+            PortalThread_TCP.Start();
 
             Thread Thread_RTC_tick = new Thread(new ThreadStart(currTimeDate.TimerTick));
             Thread_RTC_tick.Start();
@@ -206,19 +205,20 @@ namespace TCP_Chat_Server_Console
         // this class is to generate random handshaking code for chat client to connect to worker chat server
         // when new connection, new handshaking code
         // if worker chat server received wrong handshake code from chat client, connection will be closed.
-        public class class_Handshake_Code
+        public class class_Handshake_Passcode
         {
-            private int Handshake_Code;
+            private int Handshake_Passcode;
             private bool isLocked;
 
-            public class_Handshake_Code()
+            public class_Handshake_Passcode()
             {
                 isLocked = false;
 
-                Handshake_Code = 0;
+                Random myRandom = new Random();
+                Handshake_Passcode = myRandom.Next(100);
             }
 
-            public int set_Handshake_Passcode()
+            public void set_Handshake_Passcode()
             {
                 Random myRandom = new Random();
 
@@ -229,18 +229,16 @@ namespace TCP_Chat_Server_Console
                     Monitor.Wait(this);                     //enter WaitSleepJoin state
                 isLocked = true;
 
-                Handshake_Code = myRandom.Next(100);
+                Handshake_Passcode = myRandom.Next(100);
 
                 isLocked = false;
                 Monitor.Pulse(this);                    //tell waiting thread(if there is one) to become ready to execute (Running state)
                 Monitor.Exit(this);                     //release lock on this object
-
-                return Handshake_Code;
             }
 
-            public int get_Handshake_code()
+            public int get_Handshake_Passcode()
             {
-                int _Handshake_Code;
+                int _Handshake_Passcode;
 
                 Monitor.Enter(this);                        //obtain lock on this object
 
@@ -249,13 +247,13 @@ namespace TCP_Chat_Server_Console
                     Monitor.Wait(this);                     //enter WaitSleepJoin state
                 isLocked = true;
 
-                _Handshake_Code = Handshake_Code;
+                _Handshake_Passcode = Handshake_Passcode;
 
                 isLocked = false;
                 Monitor.Pulse(this);                    //tell waiting thread(if there is one) to become ready to execute (Running state)
                 Monitor.Exit(this);                     //release lock on this object
 
-                return _Handshake_Code;
+                return _Handshake_Passcode;
             }
         }
 
@@ -591,9 +589,7 @@ namespace TCP_Chat_Server_Console
             // allow a client to connect; displays text the client sends
             public void RunServer()
             {
-                int errors_count = 0;
-
-                while (RunProgram && errors_count < 100)
+                while (RunProgram)
                 {
                     // wait for a client connection and display the text that the client sends
                     try
@@ -619,7 +615,7 @@ namespace TCP_Chat_Server_Console
                             Console.WriteLine("worker port " + port_number + " connected to client wih IP " + ep.Address.ToString());
 
                         string theReply = "";
-                        HandshakePasscode = object_Handshake_Passcode[worker_TCP_ChatServer_ID].get_Handshake_code();
+                        HandshakePasscode = object_Handshake_Passcode[worker_TCP_ChatServer_ID].get_Handshake_Passcode();
 
                         // read handshaking passcode sent from client to worker server. Client must send handshake passcode to server within 1 second, or else worker server will close this connection.
                         object_check_connection_timeout.set_timeout_IdleConnection(worker_TCP_ChatServer_ID, 1);
@@ -678,10 +674,9 @@ namespace TCP_Chat_Server_Console
                         else
                         {
                             // If TCP client's handshake passcode does not tally with worker TCP server. Or client sending other irrelevant info but not handshake passcode.
-                            if(theReply != "")
+                            //client only has one chance sends the correct handshake passcode.
+                            if (theReply != "")
                                 server_send_text("SERVER" + port_number + ">>> Wrong handshake passcode");
-                                
-                            object_Handshake_Passcode[port_number - 50001].set_Handshake_Passcode();                // Worker server change to new handshake passcode. Purpose is client only has one chance sends the correct handshake passcode.
                         }
 
                         if (theReply == "CLIENT>>> TERMINATE")
@@ -689,8 +684,8 @@ namespace TCP_Chat_Server_Console
                     }
                     catch (Exception error)
                     {
-                        errors_count++;
                         Console.WriteLine(error.ToString());
+                        Thread.Sleep(100);
                     }
                     finally
                     {
@@ -700,6 +695,7 @@ namespace TCP_Chat_Server_Console
                         socketStream.Close();
                         connection.Close();
 
+                        object_Handshake_Passcode[port_number - 50001].set_Handshake_Passcode();    // Worker server change to new handshake passcode whenever closing the current connection.
                         object_check_connection_timeout.remove_isConnected(worker_TCP_ChatServer_ID);
                         shared_worker_TCPServer_status.Push(port_number);         //This worker TCP server is available to receive new incoming TCP client connection.
                     }
@@ -744,14 +740,13 @@ namespace TCP_Chat_Server_Console
 
                 for (int i = 0; i < worker_TCPServer_count; i++)
                     shared_worker_TCPServer_status.Push(i + 50001);
+                
             }
 
             // allow a client to connect; displays text the client sends
             public void RunServer()
             {
-                int errors_count = 0;
-
-                while (RunProgram && errors_count < 100)
+                while (RunProgram)
                 {
                     // wait for a client connection and display the text that the client sends
                     try
@@ -777,7 +772,7 @@ namespace TCP_Chat_Server_Console
                             if (worker_TCP_port.Item1)
                             {
                                 object_check_connection_timeout.set_timeout_WaitingConnection(worker_TCP_port.Item2 - 50001);
-                                writer.Write("SERVER>>>Port=>" + worker_TCP_port.Item2 + ",HandshakeCode=" + object_Handshake_Passcode[worker_TCP_port.Item2 - 50001].set_Handshake_Passcode());
+                                writer.Write("SERVER>>>Port=>" + worker_TCP_port.Item2 + ",HandshakeCode=" + object_Handshake_Passcode[worker_TCP_port.Item2 - 50001].get_Handshake_Passcode());
                                 //Console.WriteLine("\r\nAssigned to port " + worker_TCP_port.Item2);
                             }
                             else
@@ -795,8 +790,8 @@ namespace TCP_Chat_Server_Console
                     }
                     catch (Exception error)
                     {
-                        errors_count++;
                         Console.WriteLine(error.ToString());
+                        Thread.Sleep(100);
                     }
                 }
             }
