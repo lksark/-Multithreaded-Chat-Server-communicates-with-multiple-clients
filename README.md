@@ -20,6 +20,7 @@ Single multithreaded TCP server can maintain communications and duplex data tran
     b. Afterward, chat-client connect to the assigned port of ‘Worker TCP Server’ and send the handshake passcode to maintain connection.
 
     c. If ‘Worker TCP Server’ did not get the correct handshake passcode in the first string sent by client, ‘Worker TCP Server’ closes the TCP connection. Worker server will change to new handshake passcode. Client only has one chance sends the correct handshake passcode, client will not able to attempt second time. Client should visit ‘Portal TCP Server' again to re-attempt connection.
+    
     d. After ‘Worker TCP Server’ close a connection, either closed normally or closed with exceptional error, or closed because client sent a wrong handshake passcode, ‘Worker TCP Server’ will change the handshake passcode. Hence, client will not able to connect to the same ‘Worker TCP Server’ with the previously received handshake passcode, or by multiple passcodes trial-and-error method.
 
   6. After chat-client established TCP connection with the assigned ‘Worker TCP Server’. If chat-client idle and do not send message to ‘Worker TCP Server’ for a preset timeout period, the TCP connection will be closed. ‘Worker TCP Server’ send string message "SERVER>>> IDLE TIMEOUT" to inform chat-client about connection timeout. ‘Worker TCP Server’ push it port number back to shared workloads-stack, ready to listen new incoming TCP connection.
