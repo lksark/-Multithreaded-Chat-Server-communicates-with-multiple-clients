@@ -36,7 +36,16 @@ In the below example code, port number ‘50001’ chat-client will chat with po
 
 Contrast to the below example, client can tell server to establish connection with client assigned port. That's means client at initial connection inform server which client IP & port should server connect to, then close the connection. Then client listen to the pre-determine port, waiting for server to establish connection.
 
+#### Revision '0':
+
 c# multithreaded TCP chat-server Console App:  [TCP_Chat_Server_Console.cs.txt](https://github.com/lksark/-Multithreaded-Chat-Server-communicates-with-multiple-clients/blob/main/TCP_Chat_Server_Console.cs.txt)
 
-c# TCP chat-client Windows Forms App: TCP_Chat_Client.zip 
-[TCP_Chat_Client.zip](https://github.com/lksark/-Multithreaded-Chat-Server-communicates-with-multiple-clients/blob/main/TCP_Chat_Client.zip)
+c# TCP chat-client Windows Forms App: [TCP_Chat_Client.zip](https://github.com/lksark/-Multithreaded-Chat-Server-communicates-with-multiple-clients/blob/main/TCP_Chat_Client.zip)
+
+#### Revision '1':
+   1. Server & client use XML to send string & parse received string.
+   2. Add timeout check in client program. If server does not respond to client for extended period, client send ‘<CLIENT><command>IDLE TIMEOUT</command></CLIENT>’ message to server and close the connection.
+
+c# multithreaded TCP chat-server Console App:  [TCP_Chat_Server_Console_rev1.cs.txt](https://github.com/lksark/-Multithreaded-Chat-Server-communicates-with-multiple-clients/blob/main/TCP_Chat_Server_Console_rev1.cs.txt)
+
+c# TCP chat-client Windows Forms App: [TCP_Chat_Client_rev1.zip](https://github.com/lksark/-Multithreaded-Chat-Server-communicates-with-multiple-clients/blob/main/TCP_Chat_Client_rev1.zip)
