@@ -52,7 +52,7 @@ c# chat-client Windows Forms App, only TCP:  [TCP_Chat_Client_rev1.zip](https://
 #
 #### Revision '2':
    1. ‘Portal Server’ listens using UDP transport layer protocol; ‘worker servers’ listen using TCP transport layer protocol.
-      ‘Portal Server’ uses User Datagram Protocol (UDP) transport layer protocol, it provides a connectionless datagram service that prioritizes time over reliability. TCP transport layer protocol features three-way handshake, retransmission, and error-detection, adds reliability but lengthens latency.
+      ‘Portal Server’ uses User Datagram Protocol (UDP) transport layer protocol, it provides a connectionless datagram service that prioritizes time over reliability. TCP transport layer protocol features three-way handshake, retransmission, and error-detection, adds reliability but lengthens latency (Wikipedia reference).
 
 c# multithreaded chat-server Console App, UDP portal server & TCP worker servers:  [Chat_Server_Console_UDP-TCP.cs.txt](https://github.com/lksark/-Multithreaded-Chat-Server-communicates-with-multiple-clients/blob/main/Chat_Server_Console_UDP-TCP.cs.txt)
 
